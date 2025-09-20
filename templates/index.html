@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF to Speech Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .upload-form {
+            border: 2px dashed #ccc;
+            padding: 40px;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .upload-form:hover {
+            border-color: #007bff;
+            background-color: #f8f9fa;
+        }
+        input[type="file"] {
+            margin: 20px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .btn {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .progress {
+            width: 100%;
+            height: 20px;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+            display: none;
+        }
+        .progress-bar {
+            height: 100%;
+            background-color: #007bff;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+        .status {
+            text-align: center;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        .download-link {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .download-link a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .error {
+            color: #dc3545;
+            background-color: #f8d7da;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success {
+            color: #155724;
+            background-color: #d4edda;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PDF to Speech Converter</h1>
+        <p style="text-align: center; color: #666; margin-bottom: 30px;">
+            Upload a PDF file and convert it to speech using Kokoro TTS
+        </p>
+
+        <form id="uploadForm" enctype="multipart/form-data">
+            <div class="upload-form">
+                <p>Choose a PDF file to convert</p>
+                <input type="file" id="pdfFile" name="file" accept=".pdf" required>
+                <br>
+                <button type="submit" class="btn" id="convertBtn">Convert to Speech</button>
+            </div>
+        </form>
+
+        <div class="progress" id="progressContainer">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <div class="status" id="status"></div>
+
+        <div class="download-link" id="downloadContainer">
+            <a href="#" id="downloadLink" download>Download Audio File</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const fileInput = document.getElementById('pdfFile');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert('Please select a PDF file');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const convertBtn = document.getElementById('convertBtn');
+            const progressContainer = document.getElementById('progressContainer');
+            const progressBar = document.getElementById('progressBar');
+            const status = document.getElementById('status');
+            const downloadContainer = document.getElementById('downloadContainer');
+            const downloadLink = document.getElementById('downloadLink');
+
+            // Reset UI
+            convertBtn.disabled = true;
+            convertBtn.textContent = 'Converting...';
+            progressContainer.style.display = 'block';
+            downloadContainer.style.display = 'none';
+            status.textContent = 'Uploading and processing PDF...';
+            status.className = 'status';
+
+            try {
+                const response = await fetch('/convert', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    progressBar.style.width = '100%';
+                    status.textContent = 'Conversion completed successfully!';
+                    status.className = 'status success';
+
+                    downloadLink.href = '/download/' + result.filename;
+                    downloadLink.textContent = 'Download ' + result.filename;
+                    downloadContainer.style.display = 'block';
+                } else {
+                    status.textContent = 'Error: ' + result.error;
+                    status.className = 'status error';
+                }
+            } catch (error) {
+                status.textContent = 'Error: ' + error.message;
+                status.className = 'status error';
+            } finally {
+                convertBtn.disabled = false;
+                convertBtn.textContent = 'Convert to Speech';
+                setTimeout(() => {
+                    progressContainer.style.display = 'none';
+                    progressBar.style.width = '0%';
+                }, 3000);
+            }
+        });
+
+        // Simulate progress (since we can't get real-time progress easily)
+        function simulateProgress() {
+            const progressBar = document.getElementById('progressBar');
+            let width = 0;
+            const interval = setInterval(() => {
+                if (width >= 90) {
+                    clearInterval(interval);
+                } else {
+                    width += Math.random() * 10;
+                    progressBar.style.width = Math.min(width, 90) + '%';
+                }
+            }, 1000);
+        }
+
+        document.getElementById('uploadForm').addEventListener('submit', function() {
+            setTimeout(simulateProgress, 500);
+        });
+    </script>
+</body>
+</html>
