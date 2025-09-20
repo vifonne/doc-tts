@@ -7,8 +7,8 @@ pypdf==6.0.0
 soundfile==0.13.1
 pydub==0.25.1
 
-# ARM-optimized PyTorch (CPU only)
-torch==2.1.0+cpu -f https://download.pytorch.org/whl/cpu/torch_stable.html
+# PyTorch CPU version for Pi
+torch==2.1.0 --index-url https://download.pytorch.org/whl/cpu
 
 # TTS model - same version
 kokoro>=0.9.2
