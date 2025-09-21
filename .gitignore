@@ -1,3 +1,22 @@
-example.pdf
-example_audio.mp3
+# Virtual environment
 venv/
+
+# Temporary files
+uploads/
+outputs/
+*.pdf
+*.mp3
+*.wav
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# IDE files
+.vscode/
+.idea/

@@ -1,84 +1,134 @@
-# PDF to Speech Converter
+# 🎵 PDF to Speech Converter
 
-A simple Python application that converts PDF documents to speech using the Kokoro TTS model. Available as both a command-line tool and a web application.
+Convert your PDF documents to natural-sounding speech using AI-powered text-to-speech technology.
 
-## Setup
+## ✨ Features
 
-1. Create and activate virtual environment:
+- **Drag & Drop Interface**: Simply drag PDF files into the browser
+- **High-Quality Speech**: Powered by Kokoro TTS model
+- **Cross-Platform**: Works on Windows, macOS, and Linux
+- **Hardware Optimized**: Automatically uses GPU acceleration when available
+- **No Installation Required**: Just double-click to start
+- **Beautiful Web Interface**: Modern, responsive design
+- **Real-Time Progress**: See conversion progress in real-time
+
+## 🚀 Quick Start
+
+### Windows
+1. Double-click `start_app.bat`
+2. Wait for your browser to open automatically
+3. Drag your PDF file and click "Convert to Speech"
+
+### macOS
+1. Double-click `start_app.command`
+2. Wait for your browser to open automatically
+3. Drag your PDF file and click "Convert to Speech"
+
+### Linux
+1. Open terminal and run `./start_app.sh`
+2. Wait for your browser to open automatically
+3. Drag your PDF file and click "Convert to Speech"
+
+## 📋 Requirements
+
+- Python 3.8 or higher
+- Internet connection (for first-time setup)
+- FFmpeg (optional, for MP3 output - otherwise WAV will be generated)
+
+## 🚀 Hardware Acceleration
+
+The app automatically detects and optimizes for your hardware:
+
+- **Apple Silicon (M1/M2/M3/M4)**: Uses Metal Performance Shaders for GPU acceleration
+- **NVIDIA GPUs**: Uses CUDA acceleration (RTX 3050Ti, RTX 4090, etc.)
+- **Intel Macs & CPUs**: Optimized for efficiency with memory management
+- **Automatic Detection**: No configuration needed - just run and go!
+
+## 🔧 Manual Installation
+
+If you prefer to install manually:
+
 ```bash
-python3 -m venv venv
+# Create virtual environment
+python -m venv venv
+
+# Activate virtual environment
+# Windows:
+venv\Scripts\activate
+# macOS/Linux:
 source venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Install spaCy language model
+python -m spacy download en_core_web_sm
+
+# Run the app
+python app.py
 ```
 
-2. Install dependencies:
-```bash
-pip install kokoro soundfile pypdf pydub flask
-```
+## 📱 How to Use
 
-## Usage
+1. **Start the App**: Use one of the launcher scripts above
+2. **Upload PDF**: Drag and drop your PDF file or click to browse
+3. **Convert**: Click "Convert to Speech" button
+4. **Download**: Once complete, download your MP3 file
 
-### Web Application (Recommended)
+## 🎯 Supported Formats
 
-1. Start the web server:
-```bash
-./run_webapp.sh
-# or manually: source venv/bin/activate && python app.py
-```
+- **Input**: PDF files (up to 100MB)
+- **Output**: MP3 audio files (with ffmpeg) or WAV audio files (fallback)
 
-2. Open your browser and go to: `http://localhost:5000`
+## 🛠️ Troubleshooting
 
-3. Upload a PDF file and click "Convert to Speech"
+### App won't start
+- Ensure Python 3.8+ is installed
+- Check your internet connection for first-time setup
+- Try running manually: `python app.py`
 
-4. Download the generated MP3 file
+### Conversion fails
+- Ensure the PDF contains readable text (not just images)
+- Check that the PDF isn't password protected
+- Verify the file size is under 100MB
 
-### Command Line
+### Audio quality issues
+- The app uses high-quality Kokoro TTS model
+- Audio is generated at 24kHz sample rate
+- Different voice options may be added in future updates
 
-Convert a PDF to MP3:
-```bash
-python pdf_to_speech.py input.pdf -o output.mp3
-```
+### Getting WAV instead of MP3
+- This happens when ffmpeg is not installed
+- **Windows**: Install via `winget install ffmpeg` or download from ffmpeg.org
+- **macOS**: Install via `brew install ffmpeg` (requires Homebrew)
+- **Linux**: Install via `sudo apt install ffmpeg` (Ubuntu/Debian)
 
-## Features
-
-### Web App Features
-- Drag & drop PDF upload interface
-- Real-time conversion progress tracking
-- Automatic file download
-- Clean, responsive web interface
-- File cleanup (removes old files after 1 hour)
-- 16MB maximum file size limit
-
-### CLI Features
-- Automatic text chunking for large documents
-- Progress tracking during conversion
-- MP3 output format
-- Simple command-line interface
-
-## Technical Details
-
-- Uses Kokoro TTS model (82M parameters) with 'af_heart' voice
-- Extracts text from PDF using pypdf
-- Chunks large texts for better processing
-- Converts to MP3 format via WAV intermediate
-- Flask web framework for the web interface
-
-## Requirements
-
-- Python 3.10+
-- Virtual environment (recommended)
-- About 20MB output file for a typical document
-- Web browser (for web interface)
-
-## File Structure
+## 📁 Project Structure
 
 ```
-├── app.py                 # Flask web application
-├── pdf_to_speech.py      # Command-line script
-├── run_webapp.sh         # Web app startup script
+pdf-to-speech/
+├── app.py                 # Main Flask application
+├── start_app.bat         # Windows launcher
+├── start_app.command     # macOS launcher
+├── start_app.sh          # Linux launcher
+├── requirements.txt      # Python dependencies
 ├── templates/
-│   └── index.html        # Web interface template
-├── static/
-│   ├── uploads/          # Temporary PDF uploads
-│   └── downloads/        # Generated audio files
-└── venv/                 # Python virtual environment
+│   └── index.html       # Web interface
+├── uploads/             # Temporary PDF storage
+└── outputs/             # Generated audio files
 ```
+
+## 🤝 Contributing
+
+This is a simple, self-contained application. Feel free to:
+- Report bugs or issues
+- Suggest new features
+- Submit improvements
+
+## 📄 License
+
+This project is open source and available under the MIT License.
+
+---
+
+**Note**: The first run may take a few minutes as it downloads and installs dependencies. Subsequent runs will be much faster!

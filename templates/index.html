@@ -5,159 +5,344 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PDF to Speech Converter</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             padding: 20px;
-            background-color: #f5f5f5;
         }
+
         .container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #333;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .upload-form {
-            border: 2px dashed #ccc;
+            background: white;
+            border-radius: 20px;
             padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .header {
             text-align: center;
-            border-radius: 10px;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .upload-area {
+            border: 3px dashed #ddd;
+            border-radius: 15px;
+            padding: 60px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
             margin-bottom: 20px;
         }
-        .upload-form:hover {
-            border-color: #007bff;
-            background-color: #f8f9fa;
+
+        .upload-area:hover {
+            border-color: #667eea;
+            background-color: #f8f9ff;
         }
-        input[type="file"] {
-            margin: 20px 0;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+
+        .upload-area.dragover {
+            border-color: #667eea;
+            background-color: #f0f2ff;
+            transform: scale(1.02);
         }
+
+        .upload-icon {
+            font-size: 4em;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+
+        .upload-text {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .upload-subtext {
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        .file-input {
+            display: none;
+        }
+
         .btn {
-            background-color: #007bff;
+            background: linear-gradient(45deg, #667eea, #764ba2);
             color: white;
-            padding: 12px 30px;
             border: none;
-            border-radius: 5px;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
             cursor: pointer;
-            font-size: 16px;
-        }
-        .btn:hover {
-            background-color: #0056b3;
-        }
-        .btn:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-        .progress {
+            transition: all 0.3s ease;
             width: 100%;
-            height: 20px;
-            background-color: #f0f0f0;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .progress-container {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .progress-bar {
+            background: #f0f0f0;
             border-radius: 10px;
             overflow: hidden;
-            margin: 20px 0;
-            display: none;
+            height: 20px;
+            margin-bottom: 15px;
         }
-        .progress-bar {
+
+        .progress-fill {
+            background: linear-gradient(45deg, #667eea, #764ba2);
             height: 100%;
-            background-color: #007bff;
-            transition: width 0.3s ease;
             width: 0%;
+            transition: width 0.3s ease;
         }
-        .status {
+
+        .progress-text {
             text-align: center;
-            margin: 20px 0;
-            font-weight: bold;
+            color: #666;
+            font-size: 0.9em;
         }
-        .download-link {
+
+        .result-container {
             display: none;
+            margin-top: 30px;
             text-align: center;
-            margin: 20px 0;
         }
-        .download-link a {
-            color: #007bff;
+
+        .success-icon {
+            font-size: 3em;
+            color: #4caf50;
+            margin-bottom: 15px;
+        }
+
+        .download-btn {
+            background: #4caf50;
             text-decoration: none;
-            font-weight: bold;
+            display: inline-block;
+            margin-top: 15px;
         }
-        .error {
-            color: #dc3545;
-            background-color: #f8d7da;
-            padding: 10px;
-            border-radius: 5px;
-            margin: 10px 0;
+
+        .download-btn:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(76, 175, 80, 0.3);
         }
-        .success {
-            color: #155724;
-            background-color: #d4edda;
-            padding: 10px;
-            border-radius: 5px;
-            margin: 10px 0;
+
+        .error-container {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            background: #ffebee;
+            border: 1px solid #f44336;
+            border-radius: 10px;
+            color: #c62828;
+        }
+
+        .selected-file {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0f8ff;
+            border-radius: 10px;
+            color: #333;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .upload-area {
+                padding: 40px 15px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>PDF to Speech Converter</h1>
-        <p style="text-align: center; color: #666; margin-bottom: 30px;">
-            Upload a PDF file and convert it to speech using Kokoro TTS
-        </p>
-
-        <form id="uploadForm" enctype="multipart/form-data">
-            <div class="upload-form">
-                <p>Choose a PDF file to convert</p>
-                <input type="file" id="pdfFile" name="file" accept=".pdf" required>
-                <br>
-                <button type="submit" class="btn" id="convertBtn">Convert to Speech</button>
+        <div class="header">
+            <h1>🎵 PDF to Speech</h1>
+            <p>Convert your PDF documents to natural-sounding speech</p>
+            <div class="hardware-status" id="hardwareStatus" style="margin-top: 15px; padding: 10px; background: #f0f8ff; border-radius: 8px; font-size: 0.9em; color: #666;">
+                <span id="hardwareInfo">🔍 Detecting hardware...</span>
             </div>
-        </form>
-
-        <div class="progress" id="progressContainer">
-            <div class="progress-bar" id="progressBar"></div>
         </div>
 
-        <div class="status" id="status"></div>
+        <form id="uploadForm" enctype="multipart/form-data">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📄</div>
+                <div class="upload-text">Drop your PDF here or click to browse</div>
+                <div class="upload-subtext">Maximum file size: 100MB</div>
+                <input type="file" id="fileInput" class="file-input" accept=".pdf" required>
+            </div>
 
-        <div class="download-link" id="downloadContainer">
-            <a href="#" id="downloadLink" download>Download Audio File</a>
+            <div class="selected-file" id="selectedFile">
+                <strong>Selected:</strong> <span id="fileName"></span>
+            </div>
+
+            <button type="submit" class="btn" id="convertBtn">Convert to Speech</button>
+        </form>
+
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">Starting conversion...</div>
+            <div class="progress-details" id="progressDetails" style="text-align: center; color: #888; font-size: 0.8em; margin-top: 10px;"></div>
+        </div>
+
+        <div class="result-container" id="resultContainer">
+            <div class="success-icon">✅</div>
+            <h3>Conversion Complete!</h3>
+            <p>Your audio file is ready for download.</p>
+            <a href="#" class="btn download-btn" id="downloadBtn">📥 Download Audio</a>
+        </div>
+
+        <div class="error-container" id="errorContainer">
+            <strong>Error:</strong> <span id="errorMessage"></span>
         </div>
     </div>
 
     <script>
-        document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const selectedFile = document.getElementById('selectedFile');
+        const fileName = document.getElementById('fileName');
+        const uploadForm = document.getElementById('uploadForm');
+        const convertBtn = document.getElementById('convertBtn');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const progressDetails = document.getElementById('progressDetails');
+        const resultContainer = document.getElementById('resultContainer');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const errorContainer = document.getElementById('errorContainer');
+        const errorMessage = document.getElementById('errorMessage');
+        const hardwareInfo = document.getElementById('hardwareInfo');
+
+        // Drag and drop functionality
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight(e) {
+            uploadArea.classList.add('dragover');
+        }
+
+        function unhighlight(e) {
+            uploadArea.classList.remove('dragover');
+        }
+
+        uploadArea.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+
+            if (files.length > 0) {
+                fileInput.files = files;
+                handleFileSelect();
+            }
+        }
+
+        // Click to upload
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', handleFileSelect);
+
+        function handleFileSelect() {
+            const file = fileInput.files[0];
+            if (file) {
+                if (file.type !== 'application/pdf') {
+                    showError('Please select a PDF file.');
+                    return;
+                }
+
+                fileName.textContent = file.name;
+                selectedFile.style.display = 'block';
+                hideError();
+            }
+        }
+
+        // Form submission
+        uploadForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const fileInput = document.getElementById('pdfFile');
             const file = fileInput.files[0];
-
             if (!file) {
-                alert('Please select a PDF file');
+                showError('Please select a PDF file.');
                 return;
             }
 
-            const formData = new FormData();
-            formData.append('file', file);
+            // Hide previous results and errors
+            hideError();
+            resultContainer.style.display = 'none';
 
-            const convertBtn = document.getElementById('convertBtn');
-            const progressContainer = document.getElementById('progressContainer');
-            const progressBar = document.getElementById('progressBar');
-            const status = document.getElementById('status');
-            const downloadContainer = document.getElementById('downloadContainer');
-            const downloadLink = document.getElementById('downloadLink');
-
-            // Reset UI
+            // Show progress
+            progressContainer.style.display = 'block';
             convertBtn.disabled = true;
             convertBtn.textContent = 'Converting...';
-            progressContainer.style.display = 'block';
-            downloadContainer.style.display = 'none';
-            status.textContent = 'Uploading and processing PDF...';
-            status.className = 'status';
+            progressFill.style.width = '0%';
+            progressText.textContent = 'Starting conversion...';
+
+            const formData = new FormData();
+            formData.append('file', file);
 
             try {
                 const response = await fetch('/convert', {
@@ -165,50 +350,118 @@
                     body: formData
                 });
 
-                const result = await response.json();
+                const data = await response.json();
 
                 if (response.ok) {
-                    progressBar.style.width = '100%';
-                    status.textContent = 'Conversion completed successfully!';
-                    status.className = 'status success';
-
-                    downloadLink.href = '/download/' + result.filename;
-                    downloadLink.textContent = 'Download ' + result.filename;
-                    downloadContainer.style.display = 'block';
+                    // Start listening for real-time progress updates
+                    startProgressTracking(data.job_id, data.filename);
                 } else {
-                    status.textContent = 'Error: ' + result.error;
-                    status.className = 'status error';
+                    showError(data.error || 'Conversion failed. Please try again.');
+                    resetUI();
                 }
             } catch (error) {
-                status.textContent = 'Error: ' + error.message;
-                status.className = 'status error';
-            } finally {
-                convertBtn.disabled = false;
-                convertBtn.textContent = 'Convert to Speech';
-                setTimeout(() => {
-                    progressContainer.style.display = 'none';
-                    progressBar.style.width = '0%';
-                }, 3000);
+                showError('Network error. Please check your connection and try again.');
+                resetUI();
             }
         });
 
-        // Simulate progress (since we can't get real-time progress easily)
-        function simulateProgress() {
-            const progressBar = document.getElementById('progressBar');
-            let width = 0;
-            const interval = setInterval(() => {
-                if (width >= 90) {
-                    clearInterval(interval);
-                } else {
-                    width += Math.random() * 10;
-                    progressBar.style.width = Math.min(width, 90) + '%';
+        function startProgressTracking(jobId, filename) {
+            // Use Server-Sent Events for real-time progress
+            const eventSource = new EventSource(`/progress/${jobId}`);
+
+            eventSource.onmessage = function(event) {
+                try {
+                    const status = JSON.parse(event.data);
+                    updateProgress(status, filename);
+
+                    // Close connection when done
+                    if (status.status === 'completed' || status.status === 'error') {
+                        eventSource.close();
+                    }
+                } catch (e) {
+                    console.error('Error parsing progress data:', e);
                 }
-            }, 1000);
+            };
+
+            eventSource.onerror = function(event) {
+                console.error('EventSource failed:', event);
+                eventSource.close();
+                showError('Lost connection to server. Please try again.');
+                resetUI();
+            };
         }
 
-        document.getElementById('uploadForm').addEventListener('submit', function() {
-            setTimeout(simulateProgress, 500);
-        });
+        function updateProgress(status, filename) {
+            // Update progress bar
+            progressFill.style.width = status.progress + '%';
+
+            // Update progress text with detailed message
+            if (status.message) {
+                progressText.textContent = status.message;
+            } else {
+                progressText.textContent = `${status.status} (${Math.round(status.progress)}%)`;
+            }
+
+            // Show additional details if available
+            if (status.current_chunk && status.total_chunks) {
+                progressDetails.textContent = `Processing chunk ${status.current_chunk} of ${status.total_chunks}`;
+            } else if (status.progress > 0) {
+                progressDetails.textContent = `${Math.round(status.progress)}% complete`;
+            } else {
+                progressDetails.textContent = '';
+            }
+
+            // Handle completion
+            if (status.status === 'completed') {
+                setTimeout(() => {
+                    progressContainer.style.display = 'none';
+                    resultContainer.style.display = 'block';
+
+                    // Use the actual output filename from the server
+                    const outputFilename = status.output_file || filename;
+                    downloadBtn.href = `/download/${outputFilename}`;
+                    downloadBtn.download = outputFilename;
+
+                    resetUI();
+                }, 1000);
+            } else if (status.status === 'error') {
+                showError(status.message || status.error || 'Conversion failed');
+                resetUI();
+            }
+        }
+
+        function resetUI() {
+            convertBtn.disabled = false;
+            convertBtn.textContent = 'Convert to Speech';
+            if (progressContainer.style.display !== 'none') {
+                setTimeout(() => {
+                    progressContainer.style.display = 'none';
+                }, 2000);
+            }
+        }
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorContainer.style.display = 'block';
+        }
+
+        function hideError() {
+            errorContainer.style.display = 'none';
+        }
+
+        // Load hardware information on page load
+        async function loadHardwareInfo() {
+            try {
+                const response = await fetch('/hardware-info');
+                const data = await response.json();
+                hardwareInfo.textContent = data.status_message;
+            } catch (error) {
+                hardwareInfo.textContent = '💻 Hardware detection failed - using CPU mode';
+            }
+        }
+
+        // Load hardware info when page loads
+        document.addEventListener('DOMContentLoaded', loadHardwareInfo);
     </script>
 </body>
 </html>
