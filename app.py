@@ -150,16 +150,13 @@ class HardwareOptimizer:
                         'memory_efficient': True
                     })
                     logger.info("✅ CPU mode with memory optimization")
-                elif self.system == 'Windows':
-                    logger.info(f"💻 Windows CPU detected")
+                else:
+                    logger.info(f"💻 CPU detected: {self.system}")
                     device_info.update({
-                        'device_name': 'Windows CPU',
+                        'device_name': f'{self.system} CPU',
                         'optimization_level': 'basic'
                     })
                     logger.info("✅ CPU mode enabled")
-                else:
-                    logger.info(f"💻 Generic CPU detected: {self.system}")
-                    logger.info("✅ Basic CPU mode enabled")
 
         except ImportError as e:
             logger.warning(f"PyTorch not available: {e}")
